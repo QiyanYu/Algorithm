@@ -9,11 +9,4 @@
 - Resize Array
 
 
-## Leetcode String Tag Notes
 
-- When dealing with / , can use * to avoid divide zero problem.
-- "Plus One" 
-```java
-    int[] newNumber = new int [n+1];
-    newNumber[0] = 1;
-```
