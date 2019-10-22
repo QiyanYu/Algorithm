@@ -224,7 +224,145 @@
     }
     ```
 
+- **697. Degree of an Array：** HashMap putIfAbsent method can keep key unique.
+  ```java 
+  starter.putIfAbsent(nums[i], i); 
+  ``` 
+
+- **766. Toeplitz Matrix：** For the following up questions:
+  1. What if the matrix is stored on disk, and the memory is limited such that you can only load at most one row of the matrix into the memory at once?
+
+        ```Compare half of 1 row with half of the next/previous row.```
+
+  2. What if the matrix is so large that you can only load up a partial row into the memory at once?
+   
+        ```Hash 2 rows (so only 1 element needs to be loaded at a time) and compare the results, excluding the appropriate beginning or ending element.```
+
+- **830. Positions of Large Groups:** 
+    ```java
+    public List<List<Integer>> largeGroupPositions(String S) {
+        List<List<Integer>> res = new ArrayList<>();
+        for (int i = 0, j = 0; i < S.length(); i = j) { // reset the first pointer!!!
+            while (j < S.length() && S.charAt(j) == S.charAt(i)) j++;
+            if (j - i >= 3)
+                res.add(Arrays.asList(i, j - 1));
+        }
+        return res;
+    }
+    ```
+
+- **896. Monotonic Array:**  check whether the array is monotonic, use two flag to keep track of it.
+    ```java
+    public boolean isMonotonic(int[] A) {
+        boolean inc = true, dec = true;
+        for (int i = 1; i < A.length; ++i) {
+            inc &= A[i - 1] <= A[i];
+            dec &= A[i - 1] >= A[i];
+        }
+        return inc || dec;
+    }
+    ```
+
+- **905. Sort Array By Parity:** When dealing with two pointers, keep in mind to make sure left pointer is less than right pointer. 
+    ```java
+    class Solution {
+        public int[] sortArrayByParity(int[] A) {
+            int len = A.length;
+            for(int i = 0, j = len-1; i <= j; i++, j--){
+                while(A[i] % 2 == 0 && i < j) i++; // i < j !!!
+                while(A[j] % 2 != 0 && i < j) j--; // i < j !!!
+                
+                int temp = A[i];
+                A[i] = A[j];
+                A[j] = temp; 
+            }
+            return A;
+        }
+    }
+    ```
+- **914. X of a Kind in a Deck of Cards:** Use GCD!!!
+    ```java
+    public boolean hasGroupsSizeX(int[] deck) {
+        Map<Integer, Integer> count = new HashMap<>();
+        int res = 0;
+        for (int i : deck) count.put(i, count.getOrDefault(i, 0) + 1);
+        for (int i : count.values()) res = gcd(i, res);
+        return res > 1;
+    }
+    // Remember the algorithm!!!
+    public int gcd(int a, int b) {
+        return b > 0 ? gcd(b, a % b) : a;
+    }
+    ```
+
+- **922. Sort Array By Parity II:** Keep track of the even and odd pointers.
+    ```java
+    class Solution {
+        public int[] sortArrayByParityII(int[] A) {
+            int even = 0, odd = 1, len = A.length;
+            while(even < len && odd < len){
+                while(even < len && A[even] % 2 == 0){
+                    even += 2;
+                }
+                while(odd < len && A[odd] % 2 == 1){
+                    odd += 2;
+                }
+                if(even < len && odd < len){
+                    int temp = A[even];
+                    A[even] = A[odd];
+                    A[odd] = temp;
+                }
+            }
+            return A;
+        }
+    }
+    ```
+- **985. Sum of Even Numbers After Queries:** (from leetcode @rock)
+
+Track sum of all even #s.
+There are 4 cases for odd / even property of A[k] and queries[i][0], where k = queries[i][1]:
+1). even and odd, lose an even item in A; sum need to deduct A[k];
+2). even and even, get a bigger even item in A; sum need to add queries[i][0](same as deduct A[k] first then add both);
+3). odd and odd, get a bigger even item in A; sum need to add both;
+4). odd and even, no influence on even items in A;
+
+Therefore, we can simplify the above as following procedure:
+
+  1. find sum of all even #s;
+  2. for each queries, check the item in A and after-added-up value, if
+     - the item in A is even, deduct it from sum; according to 1) & 2).
+     - after-added-up we have an even value, then add the new value to sum; according to 2) & 3).  
+ 
+```java
+    public int[] sumEvenAfterQueries(int[] A, int[][] queries) {
+        int sum = 0, i = 0;
+        for (int a : A) { if (a % 2 == 0) sum += a ; } // sum of even #s.
+        int[] ans = new int[queries.length];
+        for (int[] q : queries) {
+            if (A[q[1]] % 2 == 0) { sum -= A[q[1]]; } // from 1) and 2)
+            A[q[1]] += q[0];
+            if (A[q[1]] % 2 == 0) { sum += A[q[1]]; } // from 2) and 3)
+            ans[i++] = sum;
+        }
+        return ans;
+    }
+```
+- **989. Add to Array-Form of Integer:** (from leetcode @rock)
+    ArrayList.add(0, K % 10) is not O(1) but O(n) instead. Use LinkedList.add(0, i) or offerFirst(i) is O(1).
+    ```java
+    public List<Integer> addToArrayForm(int[] A, int K) {
+        LinkedList<Integer> ans = new LinkedList<>();
+        for (int i = A.length - 1; K > 0 || i >= 0; --i, K /= 10) { // loop through A and K, from right to left.
+            if (i >= 0) { K += A[i]; } // Use K as carry over, and add A[i].
+            ans.offerFirst(K % 10); // add the least significant digit of K.
+        }
+        return ans;
+    }
+    ```
+
 
 ## Reference
 - Bit Manipulation in Java – Bitwise and Bit Shift operations: https://www.vojtechruzicka.com/bit-manipulation-java-bitwise-bit-shift-operations/
 - A Linear Time Majority Vote Algorithm(http://www.cs.utexas.edu/~moore/best-ideas/mjrty/)
+- Sum of Even Numbers After Queries:(from leetcode @rock) https://leetcode.com/problems/sum-of-even-numbers-after-queries/discuss/231099/Java-10-liner-odd-even-analysis-time-O(max(m-n))
+- Add to Array-Form of Integer: (from leetcode @rock) https://leetcode.com/problems/add-to-array-form-of-integer/discuss/234558/Java-6-liner-w-comment-and-analysis
