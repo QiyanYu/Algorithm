@@ -360,9 +360,142 @@ Therefore, we can simplify the above as following procedure:
     }
     ```
 
+- **999. Available Captures for Rook:** A clear way to present directions, use a private method to be concise.
+    ```java
+    class Solution {
+        public int numRookCaptures(char[][] board) {
+            int res = 0;
+            for(int r = 0; r < board.length; r++){
+                for(int c = 0; c < board[0].length; c++){
+                    if(board[r][c] == 'R') {
+                        res = cap(board, r, c);
+                    }
+                }
+            }
+            return res;
+        }
+        
+        private int cap(char[][] board, int row, int column){
+            int res = 0;
+            for(int[] d : new int[][] {{1,0}, {-1,0}, {0,1}, {0,-1}}){
+                for(int r = row + d[0], c = column + d[1]; 0 <= r && r < board.length && 0 <= c && c < board[0].length; r += d[0], c += d[1]){
+                    if(board[r][c] == 'p') res++;
+                    if(board[r][c] != '.') break;
+                }
+            }
+            return res;
+        }
+    }
+    ```
+
+- **1002. Find Common Characters:** (from leetcode @chillin1017)
+    ```java
+    public List<String> commonChars(String[] A) {
+        List<String> ans = new ArrayList<>();
+        // Common characters dictionary
+        int[] dict = new int[26];
+        for (int j = 0; j < A[0].length(); j++) {
+            dict[A[0].charAt(j) - 'a']++;
+        }
+        for (int i = 1; i < A.length; i++) {
+            // Dictionary of the current word
+            int[] curr = new int[26];
+            for (int j = 0; j < A[i].length(); j++) {
+                curr[A[i].charAt(j) - 'a']++;
+            }
+            // Update the common dictionary
+            for (int j = 0; j < 26; j++) {
+                if (curr[j] < dict[j]) dict[j] = curr[j];
+            }
+        }
+        for (int i = 0; i < 26; i++) {
+            for (int j = 0; j < dict[i]; j++) {
+                ans.add(Character.toString((char) ('a' + i)));
+            }
+        }
+        return ans;
+    }
+    ```
+- **1010. Pairs of Songs With Total Durations Divisible by 60:** (from leetcode @lee215)
+
+    **Intuition**
+
+    Calculate the time % 60 then it will be exactly same as two sum problem.
+
+    **Explanation**
+
+    t % 60 gets the remainder 0 ~ 59.
+    We count the occurrence of each remainders in a array/hashmap c.
+    we want to know that, for each t, how many x satisfy (t + x) % 60 = 0.
+
+    One idea is take x % 60 = 60 - t % 60, which is valid for the most cases.
+    But if t % 60 = 0, x % 60 = 0 instead of 60.
+    60 - t % 60 will get a number in range 1 ~ 60.
+    (60 - t % 60) % 60 can get number in range 0 ~ 59, which is what we want.
+
+    Another idea is that x % 60 = (600 - t) % 60.
+    Not sure which one is more straight forward.
+
+    ```java
+    public int numPairsDivisibleBy60(int[] time) {
+        int c[]  = new int[60], res = 0;
+        for (int t : time) {
+            res += c[(600 - t) % 60];
+            c[t % 60] += 1;
+        }
+        return res;
+    }
+    ```
+- **1051. Height Checker:** There are two way to solve this problem. First, sort the array and compare the different element. Second, maintain a record array.(Actually this is a kind of sort.)
+    ```java
+    class Solution {
+        public int heightChecker(int[] heights) {
+            int[] record = new int[101];
+            for(int h : heights) record[h]++;
+            int curr = 0, res = 0;
+            for(int i = 0; i < heights.length; i++){
+                while(record[curr] == 0) curr++;
+                if(heights[i] != curr) res++;
+                record[curr]--;
+            }
+            return res;
+        }
+    }
+    ```
+
+- **1089. Duplicate Zeros:** (from leetcode @davidluoyes)
+    ```java
+    class Solution {
+        public void duplicateZeros(int[] arr) {
+            int zero = 0;
+            for(int a : arr) {
+                if(a == 0) zero++;
+            }
+            int bigSize = arr.length + zero;
+            for(int i = arr.length-1, j = bigSize-1; i >= 0 && j >= 0; i--, j--){
+                if(arr[i] == 0){
+                    if(j < arr.length) arr[j] = arr[i];
+                    j--;
+                    if(j < arr.length) arr[j] = arr[i];
+                }else{
+                    if(j < arr.length) arr[j] = arr[i];
+                }
+            }
+        }
+    }
+    ```
+- **1128. Number of Equivalent Domino Pairs:** How to check the same pair without order.
+  1. ```int key = d[0] > d[1] ? d[0] * 10 + d[1] : d[1] * 10 + d[0];```
+  2. ```f(domino) = min(d[0], d[1]) * 10 + max(d[0], d[1])``` (from leetcode @lee215)
+  3. Use the product of primes ```primes = [2,3,5,7,11,13,17,19,23,29], f(domino) = primes[d[0]] * primes[d[1]](though primes[0] is not used)``` (from leetcode @sendAsync)
+  4. Use the bit manipulation. ```primes = [2,3,5,7,11,13,17,19,23,29], f(domino) = 1 << d[0]| 1 << d[1];``` (from leetcode @sendAsync)
+    
 
 ## Reference
 - Bit Manipulation in Java – Bitwise and Bit Shift operations: https://www.vojtechruzicka.com/bit-manipulation-java-bitwise-bit-shift-operations/
 - A Linear Time Majority Vote Algorithm(http://www.cs.utexas.edu/~moore/best-ideas/mjrty/)
 - Sum of Even Numbers After Queries:(from leetcode @rock) https://leetcode.com/problems/sum-of-even-numbers-after-queries/discuss/231099/Java-10-liner-odd-even-analysis-time-O(max(m-n))
 - Add to Array-Form of Integer: (from leetcode @rock) https://leetcode.com/problems/add-to-array-form-of-integer/discuss/234558/Java-6-liner-w-comment-and-analysis
+- Find Common Characters(from leetcode @chillin1017) https://leetcode.com/problems/find-common-characters/discuss/249739/Java-10ms-38mb-clear-solution-with-comments
+- Pairs of Songs With Total Durations Divisible by 60
+(from leetcode @lee215)https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/discuss/256738/JavaC%2B%2BPython-Two-Sum-with-K-60
