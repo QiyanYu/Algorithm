@@ -1,6 +1,6 @@
 
 
-## Leetcode String Tag Notes
+# Array
 
 - When dealing with divide, can use * to avoid divide zero problem.
 - "Plus One" 
@@ -489,7 +489,235 @@ Therefore, we can simplify the above as following procedure:
   2. ```f(domino) = min(d[0], d[1]) * 10 + max(d[0], d[1])``` (from leetcode @lee215)
   3. Use the product of primes ```primes = [2,3,5,7,11,13,17,19,23,29], f(domino) = primes[d[0]] * primes[d[1]](though primes[0] is not used)``` (from leetcode @sendAsync)
   4. Use the bit manipulation. ```primes = [2,3,5,7,11,13,17,19,23,29], f(domino) = 1 << d[0]| 1 << d[1];``` (from leetcode @sendAsync)
+
+# Two-Pointers
+- **209. Minimum Size Subarray Sum:** Use another while loop to decrement the slower pointer.
+    ```java
+    class Solution {
+        public int minSubArrayLen(int s, int[] nums) {
+            int sum = 0, j = 0, i = 0;
+            int res = Integer.MAX_VALUE;
+            while(j < nums.length){
+                sum += nums[j++];
+                while(sum >= s){
+                    res = Math.min(res, j-i);
+                    sum -= nums[i++];
+                }
+            }
+            return res >= Integer.MAX_VALUE ? 0 : res;
+        }
+    }
+    ```
+
+# String
+
+- **Add Binary:** Use **- '0'** to convert char to int.
+    ```java
+    class Solution {
+        public String addBinary(String a, String b) {
+            int aIndex = a.length()-1, bIndex = b.length()-1;
+            StringBuilder sb = new StringBuilder();
+            int carry = 0;
+            while(aIndex >= 0 || bIndex >= 0 || carry > 0){
+                int sum = carry;
+                if(aIndex >= 0) sum += a.charAt(aIndex--) - '0';
+                if(bIndex >= 0) sum += b.charAt(bIndex--) - '0';
+                carry = sum / 2;
+                sb.append(sum % 2);
+            }
+            return sb.reverse().toString();
+        }
+    }
+    ```
+- **925. Long Pressed Name:** (from leetcode@lee215)
+    ```java
+    class Solution {
+        public boolean isLongPressedName(String name, String typed) {
+            int n = name.length(), t = typed.length();
+            int index = 0;
+            for(int i = 0; i < t; i++){
+                if(index < n && name.charAt(index) == typed.charAt(i)) index++;
+                else if(index == 0 || name.charAt(index-1) != typed.charAt(i)) return false;
+            }
+            return n == index;
+        }
+    }
+    ```
+- **151. Reverse Words in a String:** (from leetcode @daniel12) Use sArr[0] to avoid last whitespace.
+    ```java
+    class Solution {
+        public String reverseWords(String s) {
+            String res = "";
+            String[] sArr = s.trim().split("\\s+");
+            for(int i = sArr.length-1; i > 0; i--){
+                res += sArr[i] + " ";
+            }
+            return res + sArr[0];
+        }
+    }
+    ```
+
+# Linked List
+- **141. Linked List Cycle:** Use two pointers to determine cycle in linked list.
+    ```java
+    public boolean hasCycle(ListNode head) {
+        if (head == null || head.next == null) {
+            return false;
+        }
+        ListNode slow = head;
+        ListNode fast = head.next;
+        while (slow != fast) {
+            if (fast == null || fast.next == null) {
+                return false;
+            }
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return true;
+    }
+    ```
+- **142. Linked List Cycle II:** Use Math! (from leetcode @qgambit2
+)
+    ```java
+    public class Solution {
+        public ListNode detectCycle(ListNode head) {
+            ListNode slow = head;
+            ListNode fast = head;
+        
+            while (fast!=null && fast.next!=null){
+                fast = fast.next.next;
+                slow = slow.next;
+                
+                if (fast == slow){
+                    ListNode slow2 = head; 
+                    while (slow2 != slow){
+                        slow = slow.next;
+                        slow2 = slow2.next;
+                    }
+                    return slow;
+                }
+            }
+            return null;
+        }
+    }
+
+- **160. Intersection of Two Linked Lists:** Use Math! (from leetcode @myfavcat123)
+    ```java
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        //boundary check
+        if(headA == null || headB == null) return null;
+        
+        ListNode a = headA;
+        ListNode b = headB;
+        
+        //if a & b have different len, then we will stop the loop after second iteration
+        while( a != b){
+            //for the end of first iteration, we just reset the pointer to the head of another linkedlist
+            a = a == null? headB : a.next;
+            b = b == null? headA : b.next;    
+        }
+        
+        return a;
+    }
+    ```
+- **19. Remove Nth Node From End of List:** Be careful about delete head node!!!
+    ```java
+    class Solution {
+        public ListNode removeNthFromEnd(ListNode head, int n) {
+            int len = getNodeLen(head);
+            int dist = len - n;
+            ListNode dummy = new ListNode(0);
+            dummy.next = head;
+            ListNode curr = dummy;
+            while(dist-- > 0){
+                curr = curr.next;
+            }
+            curr.next = curr.next.next;
+            return dummy.next;
+            
+        }
+        
+        private int getNodeLen(ListNode node){
+            int len = 0;
+            while(node != null){
+                len++;
+                node = node.next;
+            }
+            return len;
+        }
+    }
+    ```
+- **19. Remove Nth Node From End of List:** Use two pointers and only one pass!
+    ```java
+    class Solution {
+        public ListNode removeNthFromEnd(ListNode head, int n) {
+            ListNode dummy = new ListNode(0);
+            dummy.next = head;
+            ListNode fast = dummy, slow = dummy;
+            n++;//go further since the fast pointer will go the last null position 
+            while(n-- > 0){
+                fast = fast.next;
+            }
+            while(fast != null){
+                fast = fast.next;
+                slow = slow.next;
+            }
+            slow.next = slow.next.next;
+            return dummy.next;
+        }
     
+    }
+    ```
+- **234. Palindrome Linked List：** 1. Use Recursive!!! (from leetcode @sam26485178) But this is not the ```O(1)``` space solution.
+    ```java
+    public class Solution {
+        ListNode h;
+        public boolean isPalindrome(ListNode head) {
+            if (head == null) return true;
+        
+            if (h == null) h = head;
+
+            boolean tmp = true;        
+            if (head.next != null) tmp &= isPalindrome(head.next);
+        
+            tmp &= (head.val == h.val);
+            h = h.next;
+            return tmp;
+        }
+    }
+    ```
+- **234. Palindrome Linked List：** 2. Reverse the second half of the linked list and then compare two half. (from leetcode @yavinci)
+    ```java
+    public boolean isPalindrome(ListNode head) {
+        ListNode fast = head;
+        ListNode slow = head;
+
+        while(fast != null && fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        if(fast != null) slow = slow.next;
+        
+        slow = reverse(slow);
+        while(slow != null && head.val == slow.val) {
+            head = head.next;
+            slow = slow.next;
+        }
+        return slow == null;
+    }
+
+    private ListNode reverse(ListNode head) {
+        ListNode prev = null;
+        while(head != null) {
+            ListNode next = head.next;
+            head.next = prev;
+            prev = head;
+            head = next;
+        }
+        return prev;
+    }
+    ```
+
 
 ## Reference
 - Bit Manipulation in Java – Bitwise and Bit Shift operations: https://www.vojtechruzicka.com/bit-manipulation-java-bitwise-bit-shift-operations/
@@ -499,3 +727,5 @@ Therefore, we can simplify the above as following procedure:
 - Find Common Characters(from leetcode @chillin1017) https://leetcode.com/problems/find-common-characters/discuss/249739/Java-10ms-38mb-clear-solution-with-comments
 - Pairs of Songs With Total Durations Divisible by 60
 (from leetcode @lee215)https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/discuss/256738/JavaC%2B%2BPython-Two-Sum-with-K-60
+- Linked List Cycle II: (from leetcode @qgambit2) https://leetcode.com/explore/learn/card/linked-list/214/two-pointer-technique/1214/discuss/44774/Java-O(1)-space-solution-with-detailed-explanation.
+- Palindrome Linked List (from leetcode @sam26485178) https://leetcode.com/problems/palindrome-linked-list/discuss/64532/Share-my-Java-answer

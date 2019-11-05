@@ -1,8 +1,14 @@
 ## LinkedList
 ```java
 LinkedList<Integer> ans = new LinkedList<>(); 
-ans.add(0, 111) // add an element into the first index
-ans.offerFirst(111) // the same as the last one
+ans.add(0, 111); // add an element into the first index
+ans.offerFirst(111); // the same as the last one
+```
+
+## ArrayList
+```java
+ArrayList<Integer> ans = new ArrayList<>();
+ans.clear();
 ```
 
 ## Array
@@ -10,13 +16,28 @@ ans.offerFirst(111) // the same as the last one
 int[] count = new int[26]; 
 Arrays.fill(count, Integer.MAX_VALUE);
 IntStream.Of(count).sum();
-int[] copy = count.clone():
+int[] copy = count.clone();
 Arrays.sort(copy);
+Arrays.asList(1, 2);
+```
+
+## Character
+```java
+Character.toString((char) ('a' + i));
+Character.isLetterOrDigit();
+Character.toLowerCase();
+new StringBuilder(s).reverse().toString();
 ```
 
 ## String
 ```java
-Character.toString((char) ('a' + i))
+s.toLowerCase();
+s.replaceAll("regex", ",");
+s.equals();
+char[] arr = s.toCharArray();
+new String(arr);
+s.trim();
+s.split("\\s+");
 ```
 
 ## Directions
